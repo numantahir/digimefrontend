@@ -25,6 +25,18 @@ const ProfileEdit = ({ data, cover }) => {
     const [loading, setLoading] = useState(false);
     const [platforms, setPlatforms] = useState([]);
     const [image, setImage] = useState(null);
+    const [formData, setFormData] = useState({
+        id: '',
+        first_name: '',
+        last_name: '',
+        email: '',
+        user_profile_url: '',
+        bio: '',
+        website: '',
+        phone: ''
+    });
+    const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState('');
 
     // Fetch social media platforms
     useEffect(() => {
@@ -53,26 +65,6 @@ const ProfileEdit = ({ data, cover }) => {
         }
     });
 
-    // useEffect(() => {
-    //     if (data) {
-    //         console.log("social", data.social_links)
-    //         const formattedData = data.social_links && data.social_links?.reduce((acc, item) => {
-    //             acc[item.social_platform.social_name] = item.social_link;
-    //             return acc;
-    //         }, {});
-    //         reset({
-    //             profileName: data.first_name || "",
-    //             websiteUrl: data.website || "",
-    //             bio: data.bio || "",
-    //             phoneNumber: data.phone || "",
-    //             email: data?.email || "",
-    //             socialLinks: formattedData || {},
-    //             customProfileUrl: data?.user_profile_url || ""
-    //         });
-    //         setImage(data?.profile_image)
-    //     }
-    // }, [data, reset]);
-
     useEffect(() => {
         if (data) {
             console.log("Received API Data:", data);
@@ -93,10 +85,19 @@ const ProfileEdit = ({ data, cover }) => {
             });
     
             setImage(data.profile_image || null);
+            setFormData({
+                id: data.id || '',
+                first_name: data.first_name || '',
+                last_name: data.last_name || '',
+                email: data.email || '',
+                user_profile_url: data.user_profile_url || '',
+                bio: data.bio || '',
+                website: data.website || '',
+                phone: data.phone || ''
+            });
         }
     }, [data, reset]);
     console.log(errors);
-
 
     const onSubmit = async (formData) => {
         setLoading(true);
@@ -135,6 +136,69 @@ const ProfileEdit = ({ data, cover }) => {
             console.error("Error updating profile:", error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+
+    const handleSubmitForm = (e) => {
+        e.preventDefault();
+        setError(null);
+        setSuccessMessage('');
+        
+        try {
+            setLoading(true);
+            console.log('Submitting data:', formData);
+            
+            const response = await updateProfile(formData);
+            console.log('Update response:', response);
+            
+            if (response?.status) {
+                setSuccessMessage('Profile updated successfully!');
+                await loadProfile(); // Reload the profile data
+            } else {
+                throw new Error(response?.message || 'Update failed');
+            }
+        } catch (err) {
+            console.error('Update error:', err);
+            setError(err.message || 'Failed to update profile');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const loadProfile = async () => {
+        try {
+            const response = await getProfile();
+            console.log('API Response:', response);
+            
+            if (response?.status && response?.data) {
+                // Extract the profile data from the nested structure
+                const profileData = response.data;
+                
+                // Update the form data with the profile data
+                setFormData({
+                    id: profileData.id || '',
+                    first_name: profileData.first_name || '',
+                    last_name: profileData.last_name || '',
+                    email: profileData.email || '',
+                    user_profile_url: profileData.user_profile_url || '',
+                    bio: profileData.bio || '',
+                    website: profileData.website || '',
+                    phone: profileData.phone || ''
+                });
+                
+                console.log('Form data set:', profileData);
+            }
+        } catch (err) {
+            console.error('Error loading profile:', err);
+            setError('Failed to load profile data');
         }
     };
 
