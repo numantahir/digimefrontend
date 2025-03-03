@@ -55,7 +55,7 @@ const ProfileEdit = ({ data, cover }) => {
     const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
-            profileName: data?.first_name ?? "Sec - I",
+            profileName: data?.first_name ?? "",
             websiteUrl: data?.website ?? "",
             bio: data?.bio ?? "",
             phoneNumber: data?.phone ?? "",
@@ -75,7 +75,7 @@ const ProfileEdit = ({ data, cover }) => {
             }, {}) || {};
     
             reset({
-                profileName: data.first_name || "Sec - F",
+                profileName: data.first_name || "",
                 websiteUrl: data.website || "",
                 bio: data.bio || "",
                 phoneNumber: data.phone || "",
@@ -87,8 +87,8 @@ const ProfileEdit = ({ data, cover }) => {
             setImage(data.profile_image || null);
             setFormData({
                 id: data.id || '',
-                first_name: data.first_name || 'Sec - G',
-                last_name: data.last_name || 'Sec - H',
+                first_name: data.first_name || '',
+                last_name: data.last_name || '',
                 email: data.email || '',
                 user_profile_url: data.user_profile_url || '',
                 bio: data.bio || '',
@@ -110,7 +110,8 @@ const ProfileEdit = ({ data, cover }) => {
             if (response?.status === true && response?.data) {
                 const profileData = response.data;
                 console.log('Profile Data to be set:', profileData);
-                setValue("profileName", profileData.first_name || "Sec - A");
+                setValue("id", profileData.id || "");
+                setValue("profileName", profileData.first_name || "");
                 setValue("websiteUrl", profileData.website || "");
                 setValue("bio", profileData.bio || "");
                 setValue("phoneNumber", profileData.phone || "");
@@ -121,8 +122,8 @@ const ProfileEdit = ({ data, cover }) => {
 
                 setFormData({
                     id: profileData.id || '',
-                    first_name: profileData.first_name || 'Sec - B',
-                    last_name: profileData.last_name || 'Sec - C',
+                    first_name: profileData.first_name || '',
+                    last_name: profileData.last_name || '',
                     email: profileData.email || '',
                     user_profile_url: profileData.user_profile_url || '',
                     bio: profileData.bio || '',
@@ -132,8 +133,8 @@ const ProfileEdit = ({ data, cover }) => {
 
                 console.log('FormData after setting:', {
                     id: profileData.id || '',
-                    first_name: profileData.first_name || 'Sec - D',
-                    last_name: profileData.last_name || 'Sec - E',
+                    first_name: profileData.first_name || '',
+                    last_name: profileData.last_name || '',
                     email: profileData.email || '',
                     user_profile_url: profileData.user_profile_url || '',
                     bio: profileData.bio || '',
