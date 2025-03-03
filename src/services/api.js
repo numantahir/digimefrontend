@@ -9,6 +9,16 @@ const axiosInstance = axios.create({
     }
 });
 
+export const logout = () => {
+    try {
+        localStorage.removeItem("usertoken");
+        return true;
+    } catch (error) {
+        console.error("Logout error:", error);
+        return false;
+    }
+};
+
 export const register = newUser => {
     return axios
         .post("https://backend-brown-xi.vercel.app/api/users/register", {
