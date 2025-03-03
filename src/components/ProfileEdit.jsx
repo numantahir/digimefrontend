@@ -59,10 +59,16 @@ const ProfileEdit = () => {
     const loadProfile = async () => {
         try {
             const response = await getProfile();
-            console.log('Profile data:', response); // Debug log
+            console.log('Raw API Response:', response); // Debug log 1
             
             if (response && response.data) {
-                const profileData = response.data;
+                // Debug log 2
+                console.log('Profile data from response:', response.data);
+                
+                // Extract data from the nested structure
+                const profileData = response.data.data || response.data;
+                console.log('Extracted profile data:', profileData); // Debug log 3
+
                 setFormData({
                     id: profileData.id || '',
                     first_name: profileData.first_name || '',
@@ -73,7 +79,11 @@ const ProfileEdit = () => {
                     website: profileData.website || '',
                     phone: profileData.phone || '',
                 });
-                setImage(profileData?.profile_image);
+
+                // Debug log 4
+                console.log('Updated formData:', formData);
+            } else {
+                throw new Error('Invalid response structure');
             }
         } catch (err) {
             console.error('Error loading profile:', err);
@@ -82,6 +92,11 @@ const ProfileEdit = () => {
             setLoading(false);
         }
     };
+
+    // Debug log 5 - Add useEffect to monitor formData changes
+    useEffect(() => {
+        console.log('FormData updated:', formData);
+    }, [formData]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -143,6 +158,10 @@ const ProfileEdit = () => {
             setLoading(false);
         }
     };
+
+    if (loading) {
+        return <div className="text-center mt-5">Loading profile data...</div>;
+    }
 
     return (
         <section className="position-relative">
