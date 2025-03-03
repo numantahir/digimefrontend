@@ -110,7 +110,15 @@ const ProfileEdit = ({ data, cover }) => {
             if (response?.status === true && response?.data) {
                 const profileData = response.data;
                 console.log('Profile Data to be set:', profileData);
-                
+                setValue("profileName", profileData.first_name || "");
+                setValue("websiteUrl", profileData.website || "");
+                setValue("bio", profileData.bio || "");
+                setValue("phoneNumber", profileData.phone || "");
+                setValue("email", profileData.email || "");
+                setValue("customProfileUrl", profileData.user_profile_url || "");
+
+                setImage(data.profile_image || null);
+
                 setFormData({
                     id: profileData.id || '',
                     first_name: profileData.first_name || '',
