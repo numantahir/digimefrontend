@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import toast from "react-hot-toast";
 import * as yup from "yup";
 import CoverUploader from "./CoverUploader";
-import { getPlatforms, updateProfile } from "../services/api";
+import { getPlatforms, updateProfile, getProfile } from "../services/api";
 import { useNavigate } from 'react-router-dom';
 
 // Validation Schema
@@ -20,11 +20,22 @@ const schema = yup.object().shape({
     customProfileUrl: yup.string(),
 });
 
-const ProfileEdit = ({ data, cover }) => {
+const ProfileEdit = () => {
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [platforms, setPlatforms] = useState([]);
     const [image, setImage] = useState(null);
+    const [formData, setFormData] = useState({
+        first_name: '',
+        last_name: '',
+        email: '',
+        user_profile_url: '',
+        bio: '',
+        website: '',
+        phone: '',
+    });
+    const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState('');
 
     // Fetch social media platforms
     useEffect(() => {
@@ -40,43 +51,80 @@ const ProfileEdit = ({ data, cover }) => {
         fetchPlatforms();
     }, []);
 
+    useEffect(() => {
+        loadProfile();
+    }, []);
+
+    const loadProfile = async () => {
+        try {
+            const response = await getProfile();
+            if (response.status && response.data) {
+                // Pre-fill form with existing data
+                setFormData({
+                    first_name: response.data.first_name || '',
+                    last_name: response.data.last_name || '',
+                    email: response.data.email || '',
+                    user_profile_url: response.data.user_profile_url || '',
+                    bio: response.data.bio || '',
+                    website: response.data.website || '',
+                    phone: response.data.phone || '',
+                });
+                setImage(response.data.profile_image);
+            }
+        } catch (err) {
+            console.error('Error loading profile:', err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
     const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
-            profileName: data?.first_name ?? "",
-            websiteUrl: data?.website ?? "",
-            bio: data?.bio ?? "",
-            phoneNumber: data?.phone ?? "",
-            email: data?.email ?? "",
+            profileName: formData.first_name || "",
+            websiteUrl: formData.website || "",
+            bio: formData.bio || "",
+            phoneNumber: formData.phone || "",
+            email: formData.email || "",
             socialLinks: {} ?? "",
-            customProfileUrl: data?.user_profile_url ?? ""
+            customProfileUrl: formData.user_profile_url || ""
         }
     });
 
     useEffect(() => {
-        if (data) {
-            console.log("social", data.social_links)
-            const formattedData = data.social_links && data.social_links?.reduce((acc, item) => {
+        if (formData) {
+            console.log("social", formData.social_links)
+            const formattedData = formData.social_links && formData.social_links?.reduce((acc, item) => {
                 acc[item.social_platform.social_name] = item.social_link;
                 return acc;
             }, {});
             reset({
-                profileName: data.first_name || "",
-                websiteUrl: data.website || "",
-                bio: data.bio || "",
-                phoneNumber: data.phone || "",
-                email: data?.email || "",
+                profileName: formData.first_name || "",
+                websiteUrl: formData.website || "",
+                bio: formData.bio || "",
+                phoneNumber: formData.phone || "",
+                email: formData.email || "",
                 socialLinks: formattedData || {},
-                customProfileUrl: data?.user_profile_url || ""
+                customProfileUrl: formData.user_profile_url || ""
             });
-            setImage(data?.profile_image)
+            setImage(formData.profile_image)
         }
-    }, [data, reset]);
+    }, [formData, reset]);
     console.log(errors);
-
 
     const onSubmit = async (formData) => {
         setLoading(true);
+        setError(null);
+        setSuccessMessage('');
         try {
             const formattedSocialLinks = platforms
                 .map(platform => ({
@@ -94,32 +142,36 @@ const ProfileEdit = ({ data, cover }) => {
                 website: formData.websiteUrl,
                 social_links: formattedSocialLinks,
                 profile_image: image,
-                cover_image: cover
             };
 
             const response = await updateProfile(payload);
 
             if (response.status === 200) {
-                toast.success("Profile updated successfully!");
+                setSuccessMessage('Profile updated successfully!');
                 setTimeout(() => {
                     navigate("/profile-view");
                 }, 1500);
             } else {
-                toast.error("Failed to update profile.");
+                throw new Error(response.message || 'Update failed');
             }
-        } catch (error) {
-            toast.error("Something went wrong. Please try again.");
-            console.error("Error updating profile:", error);
+        } catch (err) {
+            console.error('Error updating profile:', err);
+            setError(err.message);
         } finally {
             setLoading(false);
         }
     };
+
+    if (loading) return <div>Loading...</div>;
 
     return (
         <section className="position-relative">
             <Container>
                 <CoverUploader setImage={setImage} image={image} />
                 <Form onSubmit={handleSubmit(onSubmit)}>
+                    {error && <div className="error-message">{error}</div>}
+                    {successMessage && <div className="success-message">{successMessage}</div>}
+
                     <Row className="margin-edit">
                         <Col md={5}>
                             <Form.Group controlId="profileName">
