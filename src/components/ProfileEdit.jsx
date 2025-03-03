@@ -50,13 +50,14 @@ const ProfileEdit = () => {
     const loadProfile = async () => {
         try {
             const response = await getProfile();
-            console.log('Raw API Response:', response);
+            console.log('API Response:', response);
             
-            if (response && response.data) {
+            // Extract data from the nested structure
+            if (response && response.data && response.status === true) {
                 const profileData = response.data;
-                console.log('Profile data to be set:', profileData);
+                console.log('Setting profile data:', profileData);
                 
-                // Set the form data directly from the profile data
+                // Set form data with the nested data
                 setFormData({
                     id: profileData.id,
                     first_name: profileData.first_name || '',
@@ -67,6 +68,10 @@ const ProfileEdit = () => {
                     website: profileData.website || '',
                     phone: profileData.phone || ''
                 });
+
+                console.log('Form data after setting:', formData);
+            } else {
+                throw new Error('Invalid response structure');
             }
         } catch (err) {
             console.error('Error loading profile:', err);
@@ -75,6 +80,11 @@ const ProfileEdit = () => {
             setLoading(false);
         }
     };
+
+    // Debug useEffect to monitor formData changes
+    useEffect(() => {
+        console.log('Current formData:', formData);
+    }, [formData]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -87,13 +97,13 @@ const ProfileEdit = () => {
     const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
-            profileName: data?.first_name ?? "",
-            websiteUrl: data?.website ?? "",
-            bio: data?.bio ?? "",
-            phoneNumber: data?.phone ?? "",
-            email: data?.email ?? "",
+            profileName: formData?.first_name,
+            websiteUrl: formData?.website,
+            bio: formData?.bio,
+            phoneNumber: formData?.phone,
+            email: formData?.email,
             socialLinks: {} ?? "",
-            customProfileUrl: data?.user_profile_url ?? ""
+            customProfileUrl: formData?.user_profile_url
         }
     });
 
@@ -139,6 +149,10 @@ const ProfileEdit = () => {
 
     if (loading) {
         return <div className="text-center mt-5">Loading profile data...</div>;
+    }
+
+    if (error) {
+        return <div className="text-center mt-5 text-danger">Error: {error}</div>;
     }
 
     if (!formData) {
