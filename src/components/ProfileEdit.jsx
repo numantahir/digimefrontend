@@ -222,4 +222,28 @@ const ProfileEdit = () => {
                                         <img src={platform.social_icon} alt={platform.social_name} style={{ width: 20, height: 20, marginRight: 5 }} />
                                         {platform.social_name}
                                     </Form.Label>
-                                    <Form.Control className="input-edit" {...register(`socialLinks.${platform.social_name}`)} type="url" placeholder={`Enter your ${platform.social_name} link`
+                                    <Form.Control className="input-edit" {...register(`socialLinks.${platform.social_name}`)} type="url" placeholder={`Enter your ${platform.social_name} link`} />
+                                </Form.Group>
+                            </Col>
+                        ))}
+                    </Row>
+
+                    <Form.Group controlId="customProfileUrl" className="profiles-margin">
+                        <Form.Label className="label-form">Profile URL</Form.Label>
+                        <Form.Control className="input-edit" {...register("customProfileUrl")} type="text" placeholder="Enter your custom profile URL" />
+                    </Form.Group>
+
+                    <button 
+                        type="submit" 
+                        className="submit-button"
+                        disabled={loading}
+                    >
+                        {loading ? 'Updating...' : 'Update Profile'}
+                    </button>
+                </Form>
+            </Container>
+        </section>
+    );
+};
+
+export default ProfileEdit;
