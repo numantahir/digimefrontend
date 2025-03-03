@@ -193,13 +193,26 @@ export const getSavedProfile = async () => {
 }
 
 export const updateProfile = async (payload) => {
-    return await axios
-        .put("https://backend-brown-xi.vercel.app/api/users/update", payload, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("usertoken")}`
-            }
-        })
-}
+    try {
+        const response = await getProfile(); // First get current profile to get the ID
+        const userId = response.data.id; // Extract user ID from profile data
+
+        // Add the ID to the payload
+        const updatedPayload = {
+            ...payload,
+            id: userId
+        };
+
+        return await axios.put(
+            `${API_BASE_URL}users/update`,
+            updatedPayload,
+            { headers: getAuthHeader() }
+        );
+    } catch (error) {
+        console.error("Error updating profile:", error);
+        throw error;
+    }
+};
 
 export const updateProfileImage = async (payload) => {
     return await axios

@@ -26,6 +26,7 @@ const ProfileEdit = () => {
     const [platforms, setPlatforms] = useState([]);
     const [image, setImage] = useState(null);
     const [formData, setFormData] = useState({
+        id: '',
         first_name: '',
         last_name: '',
         email: '',
@@ -59,8 +60,9 @@ const ProfileEdit = () => {
         try {
             const response = await getProfile();
             if (response.status && response.data) {
-                // Pre-fill form with existing data
+                // Pre-fill form with existing data, including ID
                 setFormData({
+                    id: response.data.id,
                     first_name: response.data.first_name || '',
                     last_name: response.data.last_name || '',
                     email: response.data.email || '',
@@ -134,6 +136,7 @@ const ProfileEdit = () => {
                 .filter(item => item.social_link.trim() !== "");
 
             const payload = {
+                id: formData.id,
                 first_name: formData.profileName,
                 last_name: formData.profileName,
                 bio: formData.bio,
@@ -219,42 +222,4 @@ const ProfileEdit = () => {
                                         <img src={platform.social_icon} alt={platform.social_name} style={{ width: 20, height: 20, marginRight: 5 }} />
                                         {platform.social_name}
                                     </Form.Label>
-                                    <Form.Control className="input-edit" {...register(`socialLinks.${platform.social_name}`)} type="url" placeholder={`Enter your ${platform.social_name} link`} />
-                                    <small className="text-danger">{errors?.socialLinks?.[platform.social_name]?.message}</small>
-                                </Form.Group>
-                            </Col>
-                        ))}
-                    </Row>
-
-                    <Row className="mb-3 customize-url simple-edits">
-                        <Col md={6}>
-                            <Form.Group controlId="customProfileUrl">
-                                <Form.Label className="label-form">Customize Profile URL</Form.Label>
-                                <Form.Control className="input-edit" {...register("customProfileUrl")} readOnly type="url" placeholder="Enter your custom URL" />
-                                <small className="text-danger">{errors.customProfileUrl?.message}</small>
-                            </Form.Group>
-                        </Col>
-                    </Row>
-
-                    <div className="d-flex justify-content-end gap-3 align-items-center margin-btns">
-                        <Button variant="" disabled={loading} className="cancel-btn">Cancel</Button>
-                        <Button variant="" className="save-btn d-flex justify-content-center align-items-center gap-2" type="submit" disabled={loading}>
-                            Update Profile
-                            {loading ? (
-                                <Spinner
-                                    as="span"
-                                    animation="border"
-                                    size="sm"
-                                    role="status"
-                                    aria-hidden="true"
-                                />
-                            ) : null}
-                        </Button>
-                    </div>
-                </Form>
-            </Container>
-        </section>
-    );
-};
-
-export default ProfileEdit;
+                                    <Form.Control className="input-edit" {...register(`socialLinks.${platform.social_name}`)} type="url" placeholder={`Enter your ${platform.social_name} link`
