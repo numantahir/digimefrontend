@@ -105,10 +105,12 @@ const ProfileEdit = ({ data, cover }) => {
     const loadProfile = async () => {
         try {
             const response = await getProfile();
-            console.log('API Response:', response);
+            console.log('Full API Response:', response);
             
-            if (response?.status && response?.data) {
+            if (response?.status === true && response?.data) {
                 const profileData = response.data;
+                console.log('Profile Data to be set:', profileData);
+                
                 setFormData({
                     id: profileData.id || '',
                     first_name: profileData.first_name || '',
@@ -119,7 +121,17 @@ const ProfileEdit = ({ data, cover }) => {
                     website: profileData.website || '',
                     phone: profileData.phone || ''
                 });
-                console.log('Form data set:', profileData);
+
+                console.log('FormData after setting:', {
+                    id: profileData.id || '',
+                    first_name: profileData.first_name || '',
+                    last_name: profileData.last_name || '',
+                    email: profileData.email || '',
+                    user_profile_url: profileData.user_profile_url || '',
+                    bio: profileData.bio || '',
+                    website: profileData.website || '',
+                    phone: profileData.phone || ''
+                });
             }
         } catch (err) {
             console.error('Error loading profile:', err);
@@ -128,6 +140,11 @@ const ProfileEdit = ({ data, cover }) => {
             setLoading(false);
         }
     };
+
+    // Debug: Log formData changes
+    useEffect(() => {
+        console.log('Current formData state:', formData);
+    }, [formData]);
 
     const onSubmit = async (formData) => {
         setLoading(true);
@@ -183,8 +200,12 @@ const ProfileEdit = ({ data, cover }) => {
         setSuccessMessage('');
         setLoading(true);
         
+        // Log the data being submitted
+        console.log('Submitting form data:', formData);
+
         updateProfile(formData)
             .then(response => {
+                console.log('Update response:', response);
                 if (response?.status) {
                     setSuccessMessage('Profile updated successfully!');
                     return loadProfile();
@@ -200,6 +221,14 @@ const ProfileEdit = ({ data, cover }) => {
                 setLoading(false);
             });
     };
+
+    // Show loading state
+    if (loading) {
+        return <div className="text-center mt-5">Loading profile data...</div>;
+    }
+
+    // Debug: Log render
+    console.log('Rendering with formData:', formData);
 
     return (
         <section className="position-relative">
