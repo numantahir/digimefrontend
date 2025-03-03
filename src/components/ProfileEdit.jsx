@@ -50,28 +50,14 @@ const ProfileEdit = () => {
     const loadProfile = async () => {
         try {
             const response = await getProfile();
-            console.log('API Response:', response);
+            console.log('Full API Response:', response);
             
-            // Extract data from the nested structure
-            if (response && response.data && response.status === true) {
-                const profileData = response.data;
-                console.log('Setting profile data:', profileData);
-                
-                // Set form data with the nested data
-                setFormData({
-                    id: profileData.id,
-                    first_name: profileData.first_name || '',
-                    last_name: profileData.last_name || '',
-                    email: profileData.email || '',
-                    user_profile_url: profileData.user_profile_url || '',
-                    bio: profileData.bio || '',
-                    website: profileData.website || '',
-                    phone: profileData.phone || ''
-                });
-
-                console.log('Form data after setting:', formData);
+            // Access the nested data structure
+            if (response?.status && response?.data) {
+                console.log('Setting form data with:', response.data);
+                setFormData(response.data);
             } else {
-                throw new Error('Invalid response structure');
+                throw new Error('Invalid data structure received');
             }
         } catch (err) {
             console.error('Error loading profile:', err);
