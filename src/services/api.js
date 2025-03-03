@@ -1,6 +1,13 @@
 import axios from "axios";
 
-const API_BASE_URL = "https://backend-brown-xi.vercel.app/api/";
+const API_BASE_URL = process.env.REACT_APP_API_URL || "https://backend-brown-xi.vercel.app/api/";
+
+const axiosInstance = axios.create({
+    baseURL: API_BASE_URL,
+    headers: {
+        'Content-Type': 'application/json'
+    }
+});
 
 export const register = newUser => {
     return axios
@@ -15,19 +22,33 @@ export const register = newUser => {
         });
 };
 
-export const login = user => {
-    return axios
-        .post("https://backend-brown-xi.vercel.app/api/users/login", {
-            email: user.email,
-            password: user.password
-        })
-        .then(response => {
-            localStorage.setItem("usertoken", response.data);
-            return response.data;
-        })
-        .catch(err => {
-            console.log(err);
-        });
+export const login = (user) => {
+    return axios.post(`${API_BASE_URL}users/login`, {
+        email: user.email,
+        password: user.password
+    })
+    .then((response) => {
+        let token;
+        if (response.data.data && response.data.data.token) {
+            token = response.data.data.token;
+        } else if (response.data.token) {
+            token = response.data.token;
+        }
+
+        if (token) {
+            localStorage.setItem("usertoken", token);
+            console.log("Token stored:", token);
+        } else {
+            console.error("No token in response:", response.data);
+            throw new Error('No token received from server');
+        }
+
+        return response.data;
+    })
+    .catch((err) => {
+        console.error("Login error:", err);
+        throw err;
+    });
 };
 
 export const ForgetPassword = user => {
@@ -43,14 +64,46 @@ export const ForgetPassword = user => {
         });
 };
 
+const getAuthHeader = () => {
+    const token = localStorage.getItem("usertoken");
+    if (!token) return {};
+
+    return {
+        Authorization: `Bearer ${token}`
+    };
+};
+
+axiosInstance.interceptors.request.use((config) => {
+    const token = localStorage.getItem("usertoken");
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
+
 export const getProfile = async () => {
-    return await axios
-        .get("https://backend-brown-xi.vercel.app/api/users/profile", {
+    try {
+        const token = localStorage.getItem("usertoken");
+        if (!token) {
+            throw new Error("No auth token found");
+        }
+
+        const response = await axios.get(`${API_BASE_URL}users/profile`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("usertoken")}`
+                Authorization: `Bearer ${token}`
             }
-        })
-}
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Profile fetch error:", error);
+        if (error.response?.status === 401) {
+            logout();
+        }
+        throw error;
+    }
+};
 
 export const updatePassword = async (payload) => {
     return await axios
@@ -70,8 +123,7 @@ export const sharedProfile = async (username) => {
 export const deleteSharedProfile = async (profileId) => {
     try {
         const token = localStorage.getItem("authToken");
-        // alert(' > ' + profileId + ' --- ' + token);
-        console.log("Token in API function:", token); // Debugging
+        console.log("Token in API function:", token);
 
         if (!token) throw new Error("No auth token found");
 
@@ -91,7 +143,6 @@ export const deleteSharedProfile = async (profileId) => {
         throw error;
     }
 };
-
 
 export const SaveSharedProfile = async (payload) => {
     return await axios
@@ -148,4 +199,11 @@ export const updateProfileImage = async (payload) => {
             }
         })
 }
+
+export const checkToken = () => {
+    const token = localStorage.getItem("usertoken");
+    console.log('Stored token:', token);
+    console.log('Token type:', typeof token);
+    return token;
+};
 
