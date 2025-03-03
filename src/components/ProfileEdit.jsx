@@ -87,13 +87,13 @@ const ProfileEdit = () => {
     const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
-            profileName: formData?.first_name,
-            websiteUrl: formData?.website,
-            bio: formData?.bio,
-            phoneNumber: formData?.phone,
-            email: formData?.email,
+            profileName: data?.first_name ?? "",
+            websiteUrl: data?.website ?? "",
+            bio: data?.bio ?? "",
+            phoneNumber: data?.phone ?? "",
+            email: data?.email ?? "",
             socialLinks: {} ?? "",
-            customProfileUrl: formData?.user_profile_url
+            customProfileUrl: data?.user_profile_url ?? ""
         }
     });
 
