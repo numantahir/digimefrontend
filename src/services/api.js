@@ -10,12 +10,13 @@ const axiosInstance = axios.create({
     }
 });
 
-// Add request interceptor to handle token
+// Updated token handling in interceptor
 axiosInstance.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem("usertoken");
         if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+            // Ensure token is a string
+            config.headers.Authorization = `Bearer ${token.toString()}`;
         }
         return config;
     },
@@ -24,7 +25,49 @@ axiosInstance.interceptors.request.use(
     }
 );
 
-// Use the axios instance for all your API calls
+// Updated login function with proper token handling
+export const login = user => {
+    return axiosInstance
+        .post('users/login', {
+            email: user.email,
+            password: user.password
+        })
+        .then(response => {
+            // Ensure we're storing a string token
+            const token = response.data.token || response.data;
+            if (typeof token === 'object') {
+                // If token is an object, stringify it or extract the token string
+                localStorage.setItem("usertoken", token.token || JSON.stringify(token));
+            } else {
+                localStorage.setItem("usertoken", token);
+            }
+            return response.data;
+        })
+        .catch(err => {
+            console.error("Login error:", err);
+            throw err;
+        });
+};
+
+// Helper function to get auth header with proper token format
+const getAuthHeader = () => {
+    const token = localStorage.getItem("usertoken");
+    if (!token) return {};
+    
+    // Ensure token is a string
+    const tokenString = typeof token === 'object' ? JSON.stringify(token) : token;
+    return {
+        Authorization: `Bearer ${tokenString}`
+    };
+};
+
+// Update other API calls to use the getAuthHeader helper
+export const getProfile = async () => {
+    return await axiosInstance.get('users/profile', {
+        headers: getAuthHeader()
+    });
+};
+
 export const register = newUser => {
     return axiosInstance
         .post('users/register', {
@@ -36,23 +79,6 @@ export const register = newUser => {
         .then(response => {
             console.log("Registered");
             return response;
-        });
-};
-
-export const login = user => {
-    return axiosInstance
-        .post('users/login', {
-            email: user.email,
-            password: user.password
-        })
-        .then(response => {
-            const token = response.data.token || response.data;
-            localStorage.setItem("usertoken", token);
-            return response.data;
-        })
-        .catch(err => {
-            console.error("Login error:", err);
-            throw err;
         });
 };
 
@@ -69,10 +95,6 @@ export const ForgetPassword = user => {
             console.log(err);
             throw err;
         });
-};
-
-export const getProfile = async () => {
-    return await axiosInstance.get('users/profile');
 };
 
 export const updatePassword = async (payload) => {
