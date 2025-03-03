@@ -11,13 +11,12 @@ import { useNavigate } from 'react-router-dom';
 // Validation Schema
 const schema = yup.object().shape({
     profileName: yup.string().required("Profile Name is required"),
-    websiteUrl: yup.string().url("Invalid URL"),
-    bio: yup.string(),
+    websiteUrl: yup.string().url("Invalid URL").nullable(),
+    bio: yup.string().nullable(),
     phoneNumber: yup.string().matches(/^[0-9+-]+$/, "Invalid phone number").required("Phone number is required"),
     email: yup.string().email("Invalid email").required("Email is required"),
-    // socialLinks: yup.array().of(yup.string().url("Invalid URL")),
-    socialLinks: yup.mixed(),
-    customProfileUrl: yup.string(),
+    socialLinks: yup.object(),
+    customProfileUrl: yup.string().nullable()
 });
 
 const ProfileEdit = ({ data, cover }) => {
@@ -26,64 +25,62 @@ const ProfileEdit = ({ data, cover }) => {
     const [platforms, setPlatforms] = useState([]);
     const [image, setImage] = useState(null);
 
+    const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm({
+        resolver: yupResolver(schema),
+        defaultValues: {
+            profileName: "",
+            websiteUrl: "",
+            bio: "",
+            phoneNumber: "",
+            email: "",
+            socialLinks: {},
+            customProfileUrl: ""
+        }
+    });
+
     // Fetch social media platforms
     useEffect(() => {
         const fetchPlatforms = async () => {
             try {
                 const response = await getPlatforms();
-                setPlatforms(response.data.data || []);
+                if (response?.data?.data) {
+                    setPlatforms(response.data.data);
+                }
             } catch (error) {
-                console.error("Error fetching platforms", error);
+                console.error("Error fetching platforms:", error);
             }
         };
-
         fetchPlatforms();
     }, []);
 
-    const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm({
-        resolver: yupResolver(schema),
-        defaultValues: {
-            profileName: data?.first_name ?? "",
-            websiteUrl: data?.website ?? "",
-            bio: data?.bio ?? "",
-            phoneNumber: data?.phone ?? "",
-            email: data?.email ?? "",
-            socialLinks: {} ?? "",
-            customProfileUrl: data?.user_profile_url ?? ""
-        }
-    });
-
     useEffect(() => {
         if (data) {
-            console.log("social", data.social_links)
-            const formattedData = data.social_links && data.social_links?.reduce((acc, item) => {
-                acc[item.social_platform.social_name] = item.social_link;
+            const formattedSocialLinks = data.social_links?.reduce((acc, item) => {
+                acc[item.social_platform?.social_name] = item.social_link;
                 return acc;
-            }, {});
+            }, {}) || {};
+
             reset({
                 profileName: data.first_name || "",
                 websiteUrl: data.website || "",
                 bio: data.bio || "",
                 phoneNumber: data.phone || "",
-                email: data?.email || "",
-                socialLinks: formattedData || {},
-                customProfileUrl: data?.user_profile_url || ""
+                email: data.email || "",
+                socialLinks: formattedSocialLinks,
+                customProfileUrl: data.user_profile_url || ""
             });
-            setImage(data?.profile_image)
+
+            setImage(data.profile_image);
         }
     }, [data, reset]);
-    console.log(errors);
-
 
     const onSubmit = async (formData) => {
         setLoading(true);
         try {
-            const formattedSocialLinks = platforms
-                .map(platform => ({
-                    social_type_id: platform.id,
-                    social_link: formData?.socialLinks[platform.social_name] || ""
-                }))
-                .filter(item => item.social_link.trim() !== "");
+            const formattedSocialLinks = platforms.map(platform => ({
+                social_type_id: platform.id,
+                social_link: formData.socialLinks?.[platform.social_name] || ""
+            })).filter(item => item.social_link.trim() !== "");
 
             const payload = {
                 first_name: formData.profileName,
@@ -99,17 +96,15 @@ const ProfileEdit = ({ data, cover }) => {
 
             const response = await updateProfile(payload);
 
-            if (response.status === 200) {
+            if (response?.status === 200) {
                 toast.success("Profile updated successfully!");
-                setTimeout(() => {
-                    navigate("/profile-view");
-                }, 1500);
+                setTimeout(() => navigate("/profile-view"), 1500);
             } else {
-                toast.error("Failed to update profile.");
+                toast.error(response?.data?.message || "Failed to update profile.");
             }
         } catch (error) {
-            toast.error("Something went wrong. Please try again.");
             console.error("Error updating profile:", error);
+            toast.error("Something went wrong. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -131,7 +126,7 @@ const ProfileEdit = ({ data, cover }) => {
                         <Col md={7}>
                             <Form.Group controlId="websiteUrl">
                                 <Form.Label className="label-form">Website URL</Form.Label>
-                                <Form.Control className="input-edit" {...register("websiteUrl")} type="url" placeholder="Enter your website url" />
+                                <Form.Control className="input-edit" {...register("websiteUrl")} type="url" placeholder="Enter your website URL" />
                                 <small className="text-danger">{errors.websiteUrl?.message}</small>
                             </Form.Group>
                         </Col>
@@ -160,7 +155,7 @@ const ProfileEdit = ({ data, cover }) => {
                     </Row>
 
                     <Row className="profiles-margin row-gap">
-                        {platforms && platforms?.map((platform, index) => (
+                        {platforms?.map((platform) => (
                             <Col md={6} key={platform.id}>
                                 <Form.Group controlId={`socialLinks.${platform.social_name}`}>
                                     <Form.Label className="label-form">
@@ -187,16 +182,7 @@ const ProfileEdit = ({ data, cover }) => {
                     <div className="d-flex justify-content-end gap-3 align-items-center margin-btns">
                         <Button variant="" disabled={loading} className="cancel-btn">Cancel</Button>
                         <Button variant="" className="save-btn d-flex justify-content-center align-items-center gap-2" type="submit" disabled={loading}>
-                            Update Profile
-                            {loading ? (
-                                <Spinner
-                                    as="span"
-                                    animation="border"
-                                    size="sm"
-                                    role="status"
-                                    aria-hidden="true"
-                                />
-                            ) : null}
+                            Update Profile {loading && <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />}
                         </Button>
                     </div>
                 </Form>
