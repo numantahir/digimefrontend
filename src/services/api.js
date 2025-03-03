@@ -1,76 +1,10 @@
-import axios from "axios";
+ximport axios from "axios";
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "https://backend-brown-xi.vercel.app/api/";
-
-// Create axios instance with default config
-const axiosInstance = axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-        'Content-Type': 'application/json',
-    }
-});
-
-// Updated token handling in interceptor
-axiosInstance.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem("usertoken");
-        if (token) {
-            // Ensure token is a string
-            config.headers.Authorization = `Bearer ${token.toString()}`;
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
-
-// Updated login function with proper token handling
-export const login = user => {
-    return axiosInstance
-        .post('users/login', {
-            email: user.email,
-            password: user.password
-        })
-        .then(response => {
-            // Ensure we're storing a string token
-            const token = response.data.token || response.data;
-            if (typeof token === 'object') {
-                // If token is an object, stringify it or extract the token string
-                localStorage.setItem("usertoken", token.token || JSON.stringify(token));
-            } else {
-                localStorage.setItem("usertoken", token);
-            }
-            return response.data;
-        })
-        .catch(err => {
-            console.error("Login error:", err);
-            throw err;
-        });
-};
-
-// Helper function to get auth header with proper token format
-const getAuthHeader = () => {
-    const token = localStorage.getItem("usertoken");
-    if (!token) return {};
-    
-    // Ensure token is a string
-    const tokenString = typeof token === 'object' ? JSON.stringify(token) : token;
-    return {
-        Authorization: `Bearer ${tokenString}`
-    };
-};
-
-// Update other API calls to use the getAuthHeader helper
-export const getProfile = async () => {
-    return await axiosInstance.get('users/profile', {
-        headers: getAuthHeader()
-    });
-};
+const API_BASE_URL = "https://backend-brown-xi.vercel.app/api/";
 
 export const register = newUser => {
-    return axiosInstance
-        .post('users/register', {
+    return axios
+        .post("https://backend-brown-xi.vercel.app/api/users/register", {
             first_name: newUser.first_name,
             last_name: newUser.last_name,
             email: newUser.email,
@@ -78,72 +12,140 @@ export const register = newUser => {
         })
         .then(response => {
             console.log("Registered");
-            return response;
+        });
+};
+
+export const login = user => {
+    return axios
+        .post("https://backend-brown-xi.vercel.app/api/users/login", {
+            email: user.email,
+            password: user.password
+        })
+        .then(response => {
+            localStorage.setItem("usertoken", response.data);
+            return response.data;
+        })
+        .catch(err => {
+            console.log(err);
         });
 };
 
 export const ForgetPassword = user => {
-    return axiosInstance
-        .post('users/reset-password', {
+    return axios
+        .post("https://backend-brown-xi.vercel.app/api/users/reset-password", {
             email: user.email
         })
         .then(response => {
-            console.log("Email Sent");
-            return response;
+            console.log("Email Send.");
         })
         .catch(err => {
             console.log(err);
-            throw err;
         });
 };
 
+export const getProfile = async () => {
+    return await axios
+        .get("https://backend-brown-xi.vercel.app/api/users/profile", {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("usertoken")}`
+            }
+        })
+}
+
 export const updatePassword = async (payload) => {
-    return await axiosInstance.post('users/resetpassword', payload);
-};
+    return await axios
+        .post("https://backend-brown-xi.vercel.app/api/users/resetpassword", payload, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("usertoken")}`
+            }
+        })
+}
 
 export const sharedProfile = async (username) => {
-    return await axiosInstance.get('users/share-profile', {
+    return await axios.get(`https://backend-brown-xi.vercel.app/api/users/share-profile`, {
         params: { url: username }
     });
 };
 
 export const deleteSharedProfile = async (profileId) => {
     try {
-        const token = localStorage.getItem("usertoken");
+        const token = localStorage.getItem("authToken");
+        // alert(' > ' + profileId + ' --- ' + token);
+        console.log("Token in API function:", token); // Debugging
+
         if (!token) throw new Error("No auth token found");
 
-        return await axiosInstance.delete(`saved-profiles/delete-profile/${profileId}`);
+        const response = await axios.delete(
+            `https://backend-brown-xi.vercel.app/api/saved-profiles/delete-profile/${profileId}`,
+            {
+                headers: {
+                     Authorization: `Bearer ${localStorage.getItem("usertoken")}`
+                },
+            }
+        );
+
+        console.log("API response:", response.data);
+        return response;
     } catch (error) {
         console.error("Error deleting profile:", error.response?.data || error.message);
         throw error;
     }
 };
 
+
 export const SaveSharedProfile = async (payload) => {
-    return await axiosInstance.post('saved-profiles/save-profile', payload);
-};
+    return await axios
+        .post("https://backend-brown-xi.vercel.app/api/saved-profiles/save-profile", payload, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("usertoken")}`
+            }
+        })
+}
 
 export const MySharedProfile = async () => {
-    return await axiosInstance.get('saved-profiles/saved-profiles', {
-        headers: {
-            "Content-Type": "application/json"
+    return await axios.get(
+        "https://backend-brown-xi.vercel.app/api/saved-profiles/saved-profiles",
+        {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("usertoken")}`,
+                "Content-Type": "application/json",
+            }
         }
-    });
+    );
 };
 
 export const getPlatforms = async () => {
-    return await axiosInstance.get('social-media-platforms/platforms');
-};
-
+    return await axios
+        .get("https://backend-brown-xi.vercel.app/api/social-media-platforms/platforms", {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("usertoken")}`
+            }
+        })
+}
 export const getSavedProfile = async () => {
-    return await axiosInstance.get('saved-profiles/saved-profiles');
-};
+    return await axios
+        .get("https://backend-brown-xi.vercel.app/api/saved-profiles/saved-profiles", {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("usertoken")}`
+            }
+        })
+}
 
 export const updateProfile = async (payload) => {
-    return await axiosInstance.put('users/update', payload);
-};
+    return await axios
+        .put("https://backend-brown-xi.vercel.app/api/users/update", payload, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("usertoken")}`
+            }
+        })
+}
 
 export const updateProfileImage = async (payload) => {
-    return await axiosInstance.put('users/update-image', payload);
-};
+    return await axios
+        .put("https://backend-brown-xi.vercel.app/api/users/update-image", payload, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("usertoken")}`
+            }
+        })
+}
 

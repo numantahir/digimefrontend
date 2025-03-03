@@ -5,7 +5,7 @@ import { DummyProfile } from '../utils';
 const SaveCard = ({ profile, onDelete }) => {
 
     const handleViewProfile = () => {
-        const profileUrl = `https://digime.novatore-solutions.com/profile/${profile.user_profile_url}`;
+        const profileUrl = `https://frontend-one-nu-27.vercel.app/profile/${profile.user_profile_url}`;
         window.location.href = profileUrl;
     };
 

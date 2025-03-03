@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
-import { DragDrop } from "../utils"; // Ensure this is a valid image path
 import { updateProfileImage } from "../services/api";
+import { DragDrop } from "../utils";
 
 const CoverUpload = ({ name, setCover, image }) => {
     const [previewImage, setPreviewImage] = useState(null);

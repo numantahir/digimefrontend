@@ -100,7 +100,7 @@ const SignUp = () => {
         password: formData.password,
       });
 
-      toast.success("Signup successful!");
+      toast.success("User Registration successful!");
       setTimeout(() => navigate("/login"), 1500);
     } catch (error) {
       console.error("Signup failed:", error.response?.data || error.message);

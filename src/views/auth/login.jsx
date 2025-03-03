@@ -3,9 +3,9 @@ import { Col, Container, Form, Row, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Goggle, logo } from "../../utils";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { login } from "../../services/api";
+import { Goggle, logo } from "../../utils";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -85,7 +85,7 @@ const Login = () => {
         toast.success("Login Successful");
         navigate("/profile-view");
       } else {
-        toast.error("Invalid email or password");
+        toast.error("User does not exist");
       }
     } catch (error) {
       toast.error(error?.message || "An error occurred");

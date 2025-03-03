@@ -90,8 +90,9 @@ const AccountSetting = () => {
                                     type="password"
                                     placeholder="Enter new password"
                                 />
-                                {errors.password && <small className="text-danger">{errors.password.message}</small>}
+                            
                             </Form.Group>
+                            {errors.password && <small className="text-danger">{errors.password.message}</small>}
                         </Col>
                     </Row>
                     <div className="d-flex justify-content-end gap-3 align-items-center margin-btns">
