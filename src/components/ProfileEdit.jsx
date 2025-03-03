@@ -166,6 +166,7 @@ const ProfileEdit = ({ data, cover }) => {
                 .filter(item => item.social_link.trim() !== "");
 
             const payload = {
+                id: formData.id,
                 first_name: formData.profileName,
                 last_name: formData.profileName,
                 bio: formData.bio,
@@ -176,7 +177,7 @@ const ProfileEdit = ({ data, cover }) => {
                 profile_image: image,
                 cover_image: cover
             };
-
+            console.log("Submitting form data:", payload);
             const response = await updateProfile(payload);
 
             if (response.status === 200) {
