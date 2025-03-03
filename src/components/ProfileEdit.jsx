@@ -25,16 +25,7 @@ const ProfileEdit = () => {
     const [loading, setLoading] = useState(true);
     const [platforms, setPlatforms] = useState([]);
     const [image, setImage] = useState(null);
-    const [formData, setFormData] = useState({
-        id: '',
-        first_name: '',
-        last_name: '',
-        email: '',
-        user_profile_url: '',
-        bio: '',
-        website: '',
-        phone: '',
-    });
+    const [formData, setFormData] = useState(null);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState('');
 
@@ -59,31 +50,23 @@ const ProfileEdit = () => {
     const loadProfile = async () => {
         try {
             const response = await getProfile();
-            console.log('Raw API Response:', response); // Debug log 1
+            console.log('Raw API Response:', response);
             
             if (response && response.data) {
-                // Debug log 2
-                console.log('Profile data from response:', response.data);
+                const profileData = response.data;
+                console.log('Profile data to be set:', profileData);
                 
-                // Extract data from the nested structure
-                const profileData = response.data.data || response.data;
-                console.log('Extracted profile data:', profileData); // Debug log 3
-
+                // Set the form data directly from the profile data
                 setFormData({
-                    id: profileData.id || '',
+                    id: profileData.id,
                     first_name: profileData.first_name || '',
                     last_name: profileData.last_name || '',
                     email: profileData.email || '',
                     user_profile_url: profileData.user_profile_url || '',
                     bio: profileData.bio || '',
                     website: profileData.website || '',
-                    phone: profileData.phone || '',
+                    phone: profileData.phone || ''
                 });
-
-                // Debug log 4
-                console.log('Updated formData:', formData);
-            } else {
-                throw new Error('Invalid response structure');
             }
         } catch (err) {
             console.error('Error loading profile:', err);
@@ -92,11 +75,6 @@ const ProfileEdit = () => {
             setLoading(false);
         }
     };
-
-    // Debug log 5 - Add useEffect to monitor formData changes
-    useEffect(() => {
-        console.log('FormData updated:', formData);
-    }, [formData]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -109,13 +87,13 @@ const ProfileEdit = () => {
     const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
-            profileName: formData.first_name,
-            websiteUrl: formData.website,
-            bio: formData.bio,
-            phoneNumber: formData.phone,
-            email: formData.email,
+            profileName: formData?.first_name,
+            websiteUrl: formData?.website,
+            bio: formData?.bio,
+            phoneNumber: formData?.phone,
+            email: formData?.email,
             socialLinks: {} ?? "",
-            customProfileUrl: formData.user_profile_url
+            customProfileUrl: formData?.user_profile_url
         }
     });
 
@@ -161,6 +139,10 @@ const ProfileEdit = () => {
 
     if (loading) {
         return <div className="text-center mt-5">Loading profile data...</div>;
+    }
+
+    if (!formData) {
+        return <div className="text-center mt-5">No profile data available</div>;
     }
 
     return (
