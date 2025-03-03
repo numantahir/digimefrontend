@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import toast from "react-hot-toast";
 import * as yup from "yup";
 import CoverUploader from "./CoverUploader";
-import { getPlatforms, updateProfile } from "../services/api";
+import { getPlatforms, updateProfile, getProfile } from "../services/api";
 import { useNavigate } from 'react-router-dom';
 
 // Validation Schema
@@ -22,7 +22,7 @@ const schema = yup.object().shape({
 
 const ProfileEdit = ({ data, cover }) => {
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [platforms, setPlatforms] = useState([]);
     const [image, setImage] = useState(null);
     const [formData, setFormData] = useState({
@@ -97,7 +97,37 @@ const ProfileEdit = ({ data, cover }) => {
             });
         }
     }, [data, reset]);
-    console.log(errors);
+
+    useEffect(() => {
+        loadProfile();
+    }, []);
+
+    const loadProfile = async () => {
+        try {
+            const response = await getProfile();
+            console.log('API Response:', response);
+            
+            if (response?.status && response?.data) {
+                const profileData = response.data;
+                setFormData({
+                    id: profileData.id || '',
+                    first_name: profileData.first_name || '',
+                    last_name: profileData.last_name || '',
+                    email: profileData.email || '',
+                    user_profile_url: profileData.user_profile_url || '',
+                    bio: profileData.bio || '',
+                    website: profileData.website || '',
+                    phone: profileData.phone || ''
+                });
+                console.log('Form data set:', profileData);
+            }
+        } catch (err) {
+            console.error('Error loading profile:', err);
+            setError('Failed to load profile data');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const onSubmit = async (formData) => {
         setLoading(true);
@@ -151,55 +181,24 @@ const ProfileEdit = ({ data, cover }) => {
         e.preventDefault();
         setError(null);
         setSuccessMessage('');
+        setLoading(true);
         
-        try {
-            setLoading(true);
-            console.log('Submitting data:', formData);
-            
-            const response = await updateProfile(formData);
-            console.log('Update response:', response);
-            
-            if (response?.status) {
-                setSuccessMessage('Profile updated successfully!');
-                await loadProfile(); // Reload the profile data
-            } else {
-                throw new Error(response?.message || 'Update failed');
-            }
-        } catch (err) {
-            console.error('Update error:', err);
-            setError(err.message || 'Failed to update profile');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const loadProfile = async () => {
-        try {
-            const response = await getProfile();
-            console.log('API Response:', response);
-            
-            if (response?.status && response?.data) {
-                // Extract the profile data from the nested structure
-                const profileData = response.data;
-                
-                // Update the form data with the profile data
-                setFormData({
-                    id: profileData.id || '',
-                    first_name: profileData.first_name || '',
-                    last_name: profileData.last_name || '',
-                    email: profileData.email || '',
-                    user_profile_url: profileData.user_profile_url || '',
-                    bio: profileData.bio || '',
-                    website: profileData.website || '',
-                    phone: profileData.phone || ''
-                });
-                
-                console.log('Form data set:', profileData);
-            }
-        } catch (err) {
-            console.error('Error loading profile:', err);
-            setError('Failed to load profile data');
-        }
+        updateProfile(formData)
+            .then(response => {
+                if (response?.status) {
+                    setSuccessMessage('Profile updated successfully!');
+                    return loadProfile();
+                } else {
+                    throw new Error(response?.message || 'Update failed');
+                }
+            })
+            .catch(err => {
+                console.error('Update error:', err);
+                setError(err.message || 'Failed to update profile');
+            })
+            .finally(() => {
+                setLoading(false);
+            });
     };
 
     return (
