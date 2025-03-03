@@ -15,8 +15,8 @@ const schema = yup.object().shape({
     bio: yup.string(),
     phoneNumber: yup.string().matches(/^[0-9+-]+$/, "Invalid phone number").required("Phone number is required"),
     email: yup.string().email("Invalid email").required("Email is required"),
-    socialLinks: yup.mixed(),
-    customProfileUrl: yup.string(),
+    socialLinks: yup.object(),
+    customProfileUrl: yup.string().url("Invalid custom URL"),
 });
 
 const ProfileEdit = () => {
@@ -34,6 +34,7 @@ const ProfileEdit = () => {
 
     useEffect(() => {
         loadProfile();
+        fetchPlatforms();
     }, []);
 
     const loadProfile = async () => {
@@ -63,30 +64,31 @@ const ProfileEdit = () => {
         }
     };
 
-    useEffect(() => {
-        const fetchPlatforms = async () => {
-            try {
-                const response = await getPlatforms();
-                setPlatforms(response.data.data || []);
-            } catch (error) {
-                console.error("Error fetching platforms", error);
-            }
-        };
-
-        fetchPlatforms();
-    }, []);
+    const fetchPlatforms = async () => {
+        try {
+            const response = await getPlatforms();
+            setPlatforms(response?.data?.data || []);
+        } catch (error) {
+            console.error("Error fetching platforms", error);
+        }
+    };
 
     const onSubmit = async (formData) => {
         setError(null);
         setSuccessMessage('');
         setLoading(true);
+
         try {
+            if (!platforms || platforms.length === 0) {
+                throw new Error("Social platforms not loaded.");
+            }
+
             const formattedSocialLinks = platforms
-                .map(platform => ({
-                    social_type_id: platform.id,
-                    social_link: formData?.socialLinks?.[platform.social_name] || ""
-                }))
-                .filter(item => item.social_link.trim() !== "");
+                .map(platform => {
+                    const socialLinkValue = formData?.socialLinks?.[platform.social_name] || "";
+                    return socialLinkValue.trim() ? { social_type_id: platform.id, social_link: socialLinkValue } : null;
+                })
+                .filter(Boolean); // Remove null entries
 
             const payload = {
                 first_name: formData.profileName,
@@ -146,6 +148,12 @@ const ProfileEdit = () => {
                         </Col>
                     </Row>
 
+                    <Form.Group controlId="customProfileUrl" className="profiles-margin">
+                        <Form.Label className="label-form">Custom Profile URL</Form.Label>
+                        <Form.Control className="input-edit" {...register("customProfileUrl")} type="text" placeholder="Enter your custom profile URL" />
+                        <small className="text-danger">{errors.customProfileUrl?.message}</small>
+                    </Form.Group>
+
                     <Form.Group controlId="bio" className="profiles-margin">
                         <Form.Label className="label-form">Bio</Form.Label>
                         <Form.Control className="input-edit bio-edit" {...register("bio")} as="textarea" rows={3} placeholder="Tell something about yourself" />
@@ -166,21 +174,6 @@ const ProfileEdit = () => {
                                 <small className="text-danger">{errors.email?.message}</small>
                             </Form.Group>
                         </Col>
-                    </Row>
-
-                    <Row className="profiles-margin row-gap">
-                        {platforms.map(platform => (
-                            <Col md={6} key={platform.id}>
-                                <Form.Group controlId={`socialLinks.${platform.social_name}`}>
-                                    <Form.Label className="label-form">
-                                        <img src={platform.social_icon} alt={platform.social_name} style={{ width: 20, height: 20, marginRight: 5 }} />
-                                        {platform.social_name}
-                                    </Form.Label>
-                                    <Form.Control className="input-edit" {...register(`socialLinks.${platform.social_name}`)} type="url" placeholder={`Enter your ${platform.social_name} link`} />
-                                    <small className="text-danger">{errors?.socialLinks?.[platform.social_name]?.message}</small>
-                                </Form.Group>
-                            </Col>
-                        ))}
                     </Row>
 
                     <div className="d-flex justify-content-end gap-3 align-items-center margin-btns">
