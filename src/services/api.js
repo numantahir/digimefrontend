@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "backend-brown-xi.vercel.app/api/";
+const API_BASE_URL = process.env.REACT_APP_API_URL || "https://backend-brown-xi.vercel.app/api/";
 
 const axiosInstance = axios.create({
     baseURL: API_BASE_URL,
@@ -21,7 +21,7 @@ export const logout = () => {
 
 export const register = newUser => {
     return axios
-        .post("backend-brown-xi.vercel.app/api/users/register", {
+        .post("https://backend-brown-xi.vercel.app/api/users/register", {
             first_name: newUser.first_name,
             last_name: newUser.last_name,
             email: newUser.email,
@@ -39,8 +39,11 @@ export const login = (user) => {
     })
     .then((response) => {
         console.log("Login response data:", response.data);
+        // alert(response.data);
+        
 
-        let token = response.data?.data?.token || response.data?.token;
+
+        let token = response.data.data.token;
 
         if (token && typeof token === 'object') {
             console.error("Received token is an object, expected a string:", token);
@@ -48,6 +51,7 @@ export const login = (user) => {
         }
 
         if (token) {
+            alert(token);
             localStorage.setItem("usertoken", token);
             console.log("Token stored:", token);
         } else {
@@ -96,7 +100,7 @@ export const login = (user) => {
 
 export const ForgetPassword = user => {
     return axios
-        .post("backend-brown-xi.vercel.app/api/users/reset-password", {
+        .post("https://backend-brown-xi.vercel.app/api/users/reset-password", {
             email: user.email
         })
         .then(response => {
@@ -150,7 +154,7 @@ export const getProfile = async () => {
 
 export const updatePassword = async (payload) => {
     return await axios
-        .post("backend-brown-xi.vercel.app/api/users/resetpassword", payload, {
+        .post("https://backend-brown-xi.vercel.app/api/users/resetpassword", payload, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
@@ -158,7 +162,7 @@ export const updatePassword = async (payload) => {
 }
 
 export const sharedProfile = async (username) => {
-    return await axios.get(`backend-brown-xi.vercel.app/api/users/share-profile`, {
+    return await axios.get(`https://backend-brown-xi.vercel.app/api/users/share-profile`, {
         params: { url: username }
     });
 };
@@ -171,7 +175,7 @@ export const deleteSharedProfile = async (profileId) => {
         if (!token) throw new Error("No auth token found");
 
         const response = await axios.delete(
-            `backend-brown-xi.vercel.app/api/saved-profiles/delete-profile/${profileId}`,
+            `https://backend-brown-xi.vercel.app/api/saved-profiles/delete-profile/${profileId}`,
             {
                 headers: {
                      Authorization: `Bearer ${localStorage.getItem("usertoken")}`
@@ -189,7 +193,7 @@ export const deleteSharedProfile = async (profileId) => {
 
 export const SaveSharedProfile = async (payload) => {
     return await axios
-        .post("backend-brown-xi.vercel.app/api/saved-profiles/save-profile", payload, {
+        .post("https://backend-brown-xi.vercel.app/api/saved-profiles/save-profile", payload, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
@@ -198,7 +202,7 @@ export const SaveSharedProfile = async (payload) => {
 
 export const MySharedProfile = async () => {
     return await axios.get(
-        "backend-brown-xi.vercel.app/api/saved-profiles/saved-profiles",
+        "https://backend-brown-xi.vercel.app/api/saved-profiles/saved-profiles",
         {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`,
@@ -210,7 +214,7 @@ export const MySharedProfile = async () => {
 
 export const getPlatforms = async () => {
     return await axios
-        .get("backend-brown-xi.vercel.app/api/social-media-platforms/platforms", {
+        .get("https://backend-brown-xi.vercel.app/api/social-media-platforms/platforms", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
@@ -218,7 +222,7 @@ export const getPlatforms = async () => {
 }
 export const getSavedProfile = async () => {
     return await axios
-        .get("backend-brown-xi.vercel.app/api/saved-profiles/saved-profiles", {
+        .get("https://backend-brown-xi.vercel.app/api/saved-profiles/saved-profiles", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
@@ -249,7 +253,7 @@ export const updateProfile = async (payload) => {
 
 export const updateProfileImage = async (payload) => {
     return await axios
-        .put("backend-brown-xi.vercel.app/api/users/update-image", payload, {
+        .put("https://backend-brown-xi.vercel.app/api/users/update-image", payload, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
