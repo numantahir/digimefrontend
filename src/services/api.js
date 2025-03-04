@@ -135,6 +135,12 @@ axiosInstance.interceptors.request.use((config) => {
 export const getProfile = async () => {
     try {
         // const token = localStorage.getItem("usertoken");
+        console.log("Secret Key:", process.env.SECRET_KEY);
+        const token_new = localStorage.getItem("usertoken");
+const decoded = JSON.parse(atob(token_new.split('.')[1])); 
+console.log("Decoded Token:", decoded);
+console.log("Token Expiry:", new Date(decoded.exp * 1000).toUTCString());
+
         let token = localStorage.getItem("usertoken");
         try {
             token = JSON.parse(token); // Convert back to object if necessary
