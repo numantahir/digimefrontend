@@ -144,7 +144,7 @@ console.log("Token Expiry:", new Date(decoded.exp * 1000).toUTCString());
 
         const response = await axios.get(`${API_BASE_URL}users/profile`, {
             headers: {
-                Authorization: `Bearer ${token}`
+                token: `Bearer ${token}`
             }
         });
         return response.data;
