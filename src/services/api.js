@@ -39,27 +39,17 @@ export const login = (user) => {
     })
     .then((response) => {
         console.log("Login response data:", response.data);
-        // alert(response.data);
-        
-
 
         let token = response.data.data.token;
-        // alert(token);
-        localStorage.setItem("usertoken", JSON.stringify(response.data.data.token));
-        // localStorage.setItem("usertoken", response.data.data.token);
-        if (token && typeof token === 'object') {
-            console.error("Received token is an object, expected a string:", token);
-            token = JSON.stringify(token); // Convert object to string
+
+        if (!token || typeof token !== 'string') {
+            console.error("Received invalid token:", token);
+            throw new Error('Invalid token received from server');
         }
 
-        if (token) {
-            // alert(token);
-            
-            console.log("Token stored:", token);
-        } else {
-            console.error("No valid token in response:", response.data);
-            throw new Error('No token received from server');
-        }
+        localStorage.setItem("usertoken", token); // Store as plain string
+
+        console.log("Token stored:", token);
 
         return response.data;
     })
@@ -68,6 +58,7 @@ export const login = (user) => {
         throw err;
     });
 };
+
 
 
 // export const login = (user) => {
