@@ -12,38 +12,76 @@ const SaveSection = () => {
 
     const apiCalled = useRef(false);
 
-    useEffect(() => {
-        const fetchProfiles = async () => {
-            if (apiCalled.current) return;
-            apiCalled.current = true;
-
-            try {
-                const token = localStorage.getItem('authToken');
-                if (!token) {
-                    throw new Error("No token found. Please log in.");
-                }
-
-                const response = await MySharedProfile(token);
-                if (response.data && Array.isArray(response.data.data)) {
-                    const fetchedProfiles = response.data.data.map(item => item.profile);
-                    const uniqueProfiles = Array.from(
-                        new Map(fetchedProfiles.map(profile => [profile.id, profile])).values()
-                    );
-                    setProfiles(uniqueProfiles);
-                } else {
-                    throw new Error("Unexpected API response format.");
-                }
-            } catch (err) {
-                console.error("Error fetching profiles:", err);
-                setError(err.message);
-            } finally {
-                setLoading(false);
+    const fetchProfiles = async () => {
+        try {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                throw new Error("No token found. Please log in.");
             }
-        };
+    
+            const response = await MySharedProfile(token);
+            console.log("API Response:", response); // 🔍 Debug API Response
+    
+            if (response.data && Array.isArray(response.data.data)) {
+                console.log("Raw Profiles from API:", response.data.data);
+                
+                const fetchedProfiles = response.data.data.map(item => item.profile);
+                console.log("Processed Profiles:", fetchedProfiles);
+    
+                setProfiles(fetchedProfiles);
+            } else {
+                throw new Error("Unexpected API response format.");
+            }
+        } catch (err) {
+            console.error("Error fetching profiles:", err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    
+    useEffect(() => {
+        // const fetchProfiles = async () => {
+        //     if (apiCalled.current) return;
+        //     apiCalled.current = true;
+
+        //     try {
+        //         const token = localStorage.getItem('authToken');
+        //         if (!token) {
+        //             throw new Error("No token found. Please log in.");
+        //         }
+
+        //         const response = await MySharedProfile(token);
+        //         console.log('MySaved Profile:--->',response);
+        //         if (response.data && Array.isArray(response.data.data)) {
+        //             const fetchedProfiles = response.data.data.map(item => item.profile);
+        //             const uniqueProfiles = Array.from(
+        //                 new Map(fetchedProfiles.map(profile => [profile.id, profile])).values()
+        //             );
+        //             setProfiles(uniqueProfiles);
+        //         } else {
+        //             throw new Error("Unexpected API response format.");
+        //         }
+        //     } catch (err) {
+        //         console.error("Error fetching profiles:", err);
+        //         setError(err.message);
+        //     } finally {
+        //         setLoading(false);
+        //     }
+        // };
+
+        
+        
 
         fetchProfiles();
     }, []);
 
+
+    useEffect(() => {
+        console.log("Profiles state updated:", profiles);
+    }, [profiles]);
+    
     // const handleDeleteProfile = async (profileId) => {
     //     try {
     //         const response = await deleteSharedProfile(profileId);
@@ -110,9 +148,10 @@ const SaveSection = () => {
     }
 
     const filteredProfiles = profiles.filter((profile) =>
-        profile.name?.toLowerCase().includes(searchText.toLowerCase())
+        profile.email?.toLowerCase().includes(searchText.toLowerCase())
     );
 
+    console.log("Filtered Profiles:", filteredProfiles);
 
     return (
         <section className='mt-3'>

@@ -43,6 +43,7 @@ const ProfileEdit = ({ data, cover }) => {
         const fetchPlatforms = async () => {
             try {
                 const response = await getPlatforms();
+                console.log('SP area----------->',response);
                 setPlatforms(response.data.data || []);
             } catch (error) {
                 console.error("Error fetching platforms", error);
@@ -109,29 +110,37 @@ const ProfileEdit = ({ data, cover }) => {
             
             if (response?.status === true && response?.data) {
                 const profileData = response.data;
-                console.log('Profile Data to be set:', profileData);
-                setValue("id", profileData.id || "");
-                setValue("profileName", profileData.first_name || "");
-                setValue("websiteUrl", profileData.website || "");
-                setValue("bio", profileData.bio || "");
-                setValue("phoneNumber", profileData.phone || "");
-                setValue("email", profileData.email || "");
-                setValue("customProfileUrl", profileData.user_profile_url || "");
+                console.log('Profile Data:', profileData);
 
-                setImage(data.profile_image || null);
+                // Format social links into an object using the correct platform key
+                const formattedSocialLinks = profileData.social_links?.reduce((acc, item) => {
+                    if (item.platform) {  // Changed from social_platform to platform
+                        acc[item.platform.social_name] = item.social_link || "";
+                    }
+                    return acc;
+                }, {}) || {};
 
-                setFormData({
+                console.log('Formatted Social Links:', formattedSocialLinks);
+
+                // Create a complete form data object
+                const completeFormData = {
                     id: profileData.id || '',
-                    first_name: profileData.first_name || '',
-                    last_name: profileData.last_name || '',
-                    email: profileData.email || '',
-                    user_profile_url: profileData.user_profile_url || '',
+                    profileName: profileData.first_name || '',
+                    websiteUrl: profileData.website || '',
                     bio: profileData.bio || '',
-                    website: profileData.website || '',
-                    phone: profileData.phone || ''
-                });
+                    phoneNumber: profileData.phone || '',
+                    email: profileData.email || '',
+                    customProfileUrl: profileData.user_profile_url || '',
+                    socialLinks: formattedSocialLinks
+                };
 
-                console.log('FormData after setting:', {
+                console.log('Setting form values:', completeFormData);
+
+                // Set all form values at once
+                reset(completeFormData);
+
+                setImage(profileData.profile_image || null);
+                setFormData({
                     id: profileData.id || '',
                     first_name: profileData.first_name || '',
                     last_name: profileData.last_name || '',

@@ -180,7 +180,7 @@ const PreviewSection = ({ data }) => {
                             <div className='social-main'>
                                 {(data?.social_links || []).map((info, index) => (
                                     <a key={index} href={info?.social_link} target="_blank" className='social-box'>
-                                        <img src={info?.social_platform?.social_icon} alt="social-icon" />
+                                        <img src={info?.platform?.social_icon} alt="social-icon" />
                                     </a>
                                 ))}
                             </div>

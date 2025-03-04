@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from 'react';
 import { Container } from "react-bootstrap";
 import { IoBookmarkOutline } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
@@ -11,7 +11,7 @@ const HeaderTwo = ({ data }) => {
     const navigate = useNavigate();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
-
+    const [profile, setProfile] = React.useState(false);
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
     };
@@ -20,9 +20,22 @@ const HeaderTwo = ({ data }) => {
         setIsMobileMenuOpen(false);
     };
 
-    const handleSaveProfile = async () => {
-        if (!data?.user_profile_url) {
-            alert("No profile URL available!");
+    // Extract the nested data object
+    const profileData = data || {};
+
+    useEffect(() => {
+        if (profileData) {
+            setProfile(Array.isArray(profileData) ? profileData[0] : profileData);
+        }
+    }, [profileData]);
+
+    const SaveProfileHandler = async () => {
+        
+        console.log("Profile Data in Click:", profile);
+        console.log("Profile URL in Click:", profile?.user_profile_url);
+
+        if (!profile?.user_profile_url) {
+            toast.error("No profile URL available!");
             return;
         }
 
@@ -30,11 +43,12 @@ const HeaderTwo = ({ data }) => {
 
         try {
             const payload = {
-                user_profile_url: data.user_profile_url
+                user_profile_url: profile.user_profile_url
             };
             const response = await SaveSharedProfile(payload);
+            console.log('SavedProfile', response);
             if (response.status === 200) {
-                toast.success("Profile save successfully!");
+                toast.success("Profile saved successfully!");
                 setTimeout(() => {
                     navigate("/save-profile");
                 }, 1500);
@@ -67,7 +81,7 @@ const HeaderTwo = ({ data }) => {
                 <div className={`menu ${isMobileMenuOpen ? "menu-open" : "menu-closed"}`}>
                     <button 
                         className="saved-profile" 
-                        onClick={handleSaveProfile}
+                        onClick={SaveProfileHandler}
                         disabled={loading}
                     >
                         <IoBookmarkOutline size={18} className="save-icon" />

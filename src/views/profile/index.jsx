@@ -12,11 +12,11 @@ const Profile = () => {
 
     const fetchProfile = async () => {
         const response = await getProfile();
-        if (response.data.status) {
-            setData(response.data.data)
+        if (response.data) {
+            setData(response.data);
         }
     }
-
+    
     useEffect(() => {
         const token = localStorage.getItem('authToken');
         if (!token) {

@@ -3,6 +3,7 @@ import { Container } from 'react-bootstrap';
 import { Cover } from '../utils';
 
 const CoverImage = ({ src }) => {
+
     return (
         <Container>
             <div className="cover-img">

@@ -13,9 +13,12 @@ const EditProfile = () => {
 
     const fetchProfile = async () => {
         const response = await getProfile();
-        if (response.data.status) {
-            setData(response.data.data)
+        //alert(' > ' + response.data.cover_image);
+        // alert(JSON.stringify(response.data));
+        if (response.data) {
+            setData(response.data);
         }
+        
     }
 
     useEffect(() => {

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "https://backend-brown-xi.vercel.app/api/";
+const API_BASE_URL = process.env.REACT_APP_API_URL || "backend-brown-xi.vercel.app/api/";
 
 const axiosInstance = axios.create({
     baseURL: API_BASE_URL,
@@ -21,7 +21,7 @@ export const logout = () => {
 
 export const register = newUser => {
     return axios
-        .post("https://backend-brown-xi.vercel.app/api/users/register", {
+        .post("backend-brown-xi.vercel.app/api/users/register", {
             first_name: newUser.first_name,
             last_name: newUser.last_name,
             email: newUser.email,
@@ -63,7 +63,7 @@ export const login = (user) => {
 
 export const ForgetPassword = user => {
     return axios
-        .post("https://backend-brown-xi.vercel.app/api/users/reset-password", {
+        .post("backend-brown-xi.vercel.app/api/users/reset-password", {
             email: user.email
         })
         .then(response => {
@@ -117,7 +117,7 @@ export const getProfile = async () => {
 
 export const updatePassword = async (payload) => {
     return await axios
-        .post("https://backend-brown-xi.vercel.app/api/users/resetpassword", payload, {
+        .post("backend-brown-xi.vercel.app/api/users/resetpassword", payload, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
@@ -125,7 +125,7 @@ export const updatePassword = async (payload) => {
 }
 
 export const sharedProfile = async (username) => {
-    return await axios.get(`https://backend-brown-xi.vercel.app/api/users/share-profile`, {
+    return await axios.get(`backend-brown-xi.vercel.app/api/users/share-profile`, {
         params: { url: username }
     });
 };
@@ -138,7 +138,7 @@ export const deleteSharedProfile = async (profileId) => {
         if (!token) throw new Error("No auth token found");
 
         const response = await axios.delete(
-            `https://backend-brown-xi.vercel.app/api/saved-profiles/delete-profile/${profileId}`,
+            `backend-brown-xi.vercel.app/api/saved-profiles/delete-profile/${profileId}`,
             {
                 headers: {
                      Authorization: `Bearer ${localStorage.getItem("usertoken")}`
@@ -156,7 +156,7 @@ export const deleteSharedProfile = async (profileId) => {
 
 export const SaveSharedProfile = async (payload) => {
     return await axios
-        .post("https://backend-brown-xi.vercel.app/api/saved-profiles/save-profile", payload, {
+        .post("backend-brown-xi.vercel.app/api/saved-profiles/save-profile", payload, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
@@ -165,7 +165,7 @@ export const SaveSharedProfile = async (payload) => {
 
 export const MySharedProfile = async () => {
     return await axios.get(
-        "https://backend-brown-xi.vercel.app/api/saved-profiles/saved-profiles",
+        "backend-brown-xi.vercel.app/api/saved-profiles/saved-profiles",
         {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`,
@@ -177,7 +177,7 @@ export const MySharedProfile = async () => {
 
 export const getPlatforms = async () => {
     return await axios
-        .get("https://backend-brown-xi.vercel.app/api/social-media-platforms/platforms", {
+        .get("backend-brown-xi.vercel.app/api/social-media-platforms/platforms", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
@@ -185,7 +185,7 @@ export const getPlatforms = async () => {
 }
 export const getSavedProfile = async () => {
     return await axios
-        .get("https://backend-brown-xi.vercel.app/api/saved-profiles/saved-profiles", {
+        .get("backend-brown-xi.vercel.app/api/saved-profiles/saved-profiles", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
@@ -216,7 +216,7 @@ export const updateProfile = async (payload) => {
 
 export const updateProfileImage = async (payload) => {
     return await axios
-        .put("https://backend-brown-xi.vercel.app/api/users/update-image", payload, {
+        .put("backend-brown-xi.vercel.app/api/users/update-image", payload, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }

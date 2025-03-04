@@ -12,8 +12,9 @@ const AccountSetting = () => {
 
     const fetchProfile = async () => {
         const response = await getProfile();
-        if (response.data.status) {
-            setUserData(response.data.data);
+        console.log(response.data);
+        if (response.data) {
+            setUserData(response.data);
         }
     };
 
