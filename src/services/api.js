@@ -40,23 +40,18 @@ export const login = (user) => {
     .then((response) => {
         console.log("Login response data:", response.data);
 
-        let token = null;
-        
-        if (response.data.data && response.data.data.token) {
-            token = response.data.data.token;
-        } else if (response.data.token) {
-            token = response.data.token;
+        let token = response.data?.data?.token || response.data?.token;
+
+        if (token && typeof token === 'object') {
+            console.error("Received token is an object, expected a string:", token);
+            token = JSON.stringify(token); // Convert object to string
         }
 
         if (token) {
-            // Ensure token is a string before storing
-            if (typeof token !== "string") {
-                token = JSON.stringify(token);
-            }
             localStorage.setItem("usertoken", token);
             console.log("Token stored:", token);
         } else {
-            console.error("No token in response:", response.data);
+            console.error("No valid token in response:", response.data);
             throw new Error('No token received from server');
         }
 
@@ -67,6 +62,7 @@ export const login = (user) => {
         throw err;
     });
 };
+
 
 // export const login = (user) => {
 //     return axios.post(`${API_BASE_URL}users/login`, {
