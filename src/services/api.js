@@ -44,7 +44,8 @@ export const login = (user) => {
 
 
         let token = response.data.data.token;
-
+        // alert(token);
+        localStorage.setItem("usertoken", response.data.data.token);
         if (token && typeof token === 'object') {
             console.error("Received token is an object, expected a string:", token);
             token = JSON.stringify(token); // Convert object to string
@@ -52,7 +53,7 @@ export const login = (user) => {
 
         if (token) {
             // alert(token);
-            localStorage.setItem("usertoken", JSON.stringify(token));
+            
             console.log("Token stored:", token);
         } else {
             console.error("No valid token in response:", response.data);
