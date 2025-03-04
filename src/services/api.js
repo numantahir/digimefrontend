@@ -45,7 +45,8 @@ export const login = (user) => {
 
         let token = response.data.data.token;
         // alert(token);
-        localStorage.setItem("usertoken", response.data.data.token);
+        localStorage.setItem("usertoken", JSON.stringify(response.data.data.token));
+        // localStorage.setItem("usertoken", response.data.data.token);
         if (token && typeof token === 'object') {
             console.error("Received token is an object, expected a string:", token);
             token = JSON.stringify(token); // Convert object to string
@@ -133,7 +134,13 @@ axiosInstance.interceptors.request.use((config) => {
 
 export const getProfile = async () => {
     try {
-        const token = localStorage.getItem("usertoken");
+        // const token = localStorage.getItem("usertoken");
+        let token = localStorage.getItem("usertoken");
+        try {
+            token = JSON.parse(token); // Convert back to object if necessary
+        } catch (e) {
+            console.warn("Token is already a string.");
+        }
         if (!token) {
             throw new Error("No auth token found");
         }
