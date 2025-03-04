@@ -51,8 +51,8 @@ export const login = (user) => {
         }
 
         if (token) {
-            alert(token);
-            localStorage.setItem("usertoken", token);
+            // alert(token);
+            localStorage.setItem("usertoken", JSON.stringify(token));
             console.log("Token stored:", token);
         } else {
             console.error("No valid token in response:", response.data);
