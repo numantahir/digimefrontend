@@ -77,8 +77,10 @@ const Login = () => {
         password: formData.password,
       });
 
+      console.log("login response ", response.data)
       if (response) {
         localStorage.setItem("authToken", true);
+        localStorage.setItem("usertoken", response.data.token);
         if (formData.rememberMe) {
           localStorage.setItem("isRemembered", true);
         }

@@ -32,7 +32,7 @@ export const register = newUser => {
         });
 };
 
-export const login = (user) => {
+export const login = async(user) => {
     return axios.post(`${API_BASE_URL}users/login`, {
         email: user.email,
         password: user.password

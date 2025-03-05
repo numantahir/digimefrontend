@@ -13,7 +13,7 @@ export default function PrivateRoute(props) {
     const params = new URLSearchParams(location.search);
     const token = params.get("token");
     if (token) {
-      localStorage.setItem("token", token);
+      localStorage.setItem("usertoken", token);
       localStorage.setItem("isLoggedIn", true);
     }
     if (login || token) {
