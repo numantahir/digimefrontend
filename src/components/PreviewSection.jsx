@@ -13,7 +13,7 @@ const PreviewSection = ({ data }) => {
     const qrRef = useRef(null);
     const navigate = useNavigate();
 
-    const profileUrl = `https://frontend-one-nu-27.vercel.app/profile/${data?.user_profile_url}`;
+    const profileUrl = `https://digime.novatore-solutions.com/profile/${data?.user_profile_url}`;
 
     const handleEditProfile = () => {
         navigate("/edit-profile");
@@ -180,7 +180,7 @@ const PreviewSection = ({ data }) => {
                             <div className='social-main'>
                                 {(data?.social_links || []).map((info, index) => (
                                     <a key={index} href={info?.social_link} target="_blank" className='social-box'>
-                                        <img src={info?.platform?.social_icon} alt="social-icon" />
+                                        <img src={info?.social_platform?.social_icon} alt="social-icon" />
                                     </a>
                                 ))}
                             </div>

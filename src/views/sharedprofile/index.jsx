@@ -42,7 +42,7 @@ const SharedProfile = () => {
         <div className="layout">
             <div className="content-main">
                 <HeaderTwo data={data} />
-                <CoverImage src={data[0].cover_image} />
+                <CoverImage src={data.cover_image} />
                 <PublicSection data={data} />
             </div>
             <Footer />

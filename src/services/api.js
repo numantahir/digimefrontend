@@ -39,15 +39,14 @@ export const login = async(user) => {
     })
     .then((response) => {
         console.log("Login response data:", response.data);
-
-        let token = response.data.data.token;
+        let token = response.data;
 
         if (!token || typeof token !== 'string') {
             console.error("Received invalid token:", token);
             throw new Error('Invalid token received from server');
         }
 
-        localStorage.setItem("usertoken", token); // Store as plain string
+        // localStorage.setItem("usertoken", token); // Store as plain string
 
         console.log("Token stored:", token);
 
