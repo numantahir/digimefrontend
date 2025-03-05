@@ -132,9 +132,10 @@ const decoded = JSON.parse(atob(token_new.split('.')[1]));
 console.log("Decoded Token:", decoded);
 console.log("Token Expiry:", new Date(decoded.exp * 1000).toUTCString());
 
-        let token = localStorage.getItem("usertoken")?.trim();;
+        let token = localStorage.getItem("usertoken")?.trim();
+        console.log('Token ...> ',token);
         try {
-            token = JSON.parse(token); // Convert back to object if necessary
+            // token = JSON.parse(token); // Convert back to object if necessary
         } catch (e) {
             console.warn("Token is already a string.");
         }
