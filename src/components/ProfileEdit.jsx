@@ -44,7 +44,8 @@ const ProfileEdit = ({ data, cover }) => {
             try {
                 const response = await getPlatforms();
                 console.log('SP area----------->',response);
-                setPlatforms(response.data || []);
+                setPlatforms(response.data.data || []);
+                console.log('UPDATED----------->',response.data.data);
             } catch (error) {
                 console.error("Error fetching platforms", error);
             }
