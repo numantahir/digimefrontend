@@ -46,7 +46,7 @@ export const login = async(user) => {
             console.error("Received invalid token:", token);
             throw new Error('Invalid token received from server');
         }
-
+        console.log('User Login Working');
         localStorage.setItem("usertoken", JSON.stringify(response.data.data.token));
 
         // console.log("Token stored:", token);
