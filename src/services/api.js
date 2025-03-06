@@ -1,5 +1,5 @@
 import axios from "axios";
-
+console.log('Testing ENV Getting or Not>>>>', process.env.BACKEND_URL);
 // const API_BASE_URL = process.env.REACT_APP_API_URL || "https://digime.novatore-solutions.com/api/";
 const API_BASE_URL = process.env.REACT_APP_API_URL || "https://backend-brown-xi.vercel.app/api/";
 
