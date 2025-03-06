@@ -13,10 +13,11 @@ const EditProfile = () => {
 
     const fetchProfile = async () => {
         const response = await getProfile();
+        console.log('Profile Data aa rahy..>', response.data);
         //alert(' > ' + response.data.cover_image);
         // alert(JSON.stringify(response.data));
         if (response.data) {
-            setData(response.data.data);
+            setData(response.data);
         }
         
     }
