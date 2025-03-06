@@ -13,7 +13,7 @@ const PreviewSection = ({ data }) => {
     const qrRef = useRef(null);
     const navigate = useNavigate();
 
-    const profileUrl = `https://digime.novatore-solutions.com/profile/${data?.user_profile_url}`;
+    const profileUrl = `https://frontend-numantahirs-projects.vercel.app/profile/${data?.user_profile_url}`;
 
     const handleEditProfile = () => {
         navigate("/edit-profile");
