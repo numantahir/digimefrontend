@@ -5,7 +5,7 @@ import { DummyProfile } from '../utils';
 const SaveCard = ({ profile, onDelete }) => {
 
     const handleViewProfile = () => {
-        const profileUrl = `https://frontend-numantahirs-projects.vercel.app/profile/${profile.user_profile_url}`;
+        const profileUrl = process.env.REACT_APP_Frontend_Url + `profile/${profile.user_profile_url}`;
         window.location.href = profileUrl;
     };
 
