@@ -44,7 +44,7 @@ const ProfileEdit = ({ data, cover }) => {
             try {
                 const response = await getPlatforms();
                 console.log('SP area----------->',response);
-                setPlatforms(response.data.data || []);
+                setPlatforms(response.data || []);
             } catch (error) {
                 console.error("Error fetching platforms", error);
             }
@@ -115,7 +115,7 @@ const ProfileEdit = ({ data, cover }) => {
                 // Format social links into an object using the correct platform key
                 const formattedSocialLinks = profileData.social_links?.reduce((acc, item) => {
                     if (item.platform) {  // Changed from social_platform to platform
-                        acc[item.social_media_platforms.social_name] = item.social_link || "";
+                        acc[item.platform.social_name] = item.social_link || "";
                     }
                     return acc;
                 }, {}) || {};
