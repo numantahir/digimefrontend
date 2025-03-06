@@ -1,5 +1,5 @@
 import axios from "axios";
-console.log('Testing ENV Getting or Not>>>>', process.env.REACT_APP_Base_Url);
+console.log('Testing ENV Getting or Not>>>>', process.env.REACT_APP_Frontend_Url);
 // const API_BASE_URL = process.env.REACT_APP_API_URL || "https://digime.novatore-solutions.com/api/";
 const API_BASE_URL = process.env.REACT_APP_API_URL || "https://backend-brown-xi.vercel.app/api/";
 
@@ -22,7 +22,7 @@ export const logout = () => {
 
 export const register = newUser => {
     return axios
-        .post("https://backend-brown-xi.vercel.app/api/users/register", {
+        .post(API_BASE_URL + "users/register", {
             first_name: newUser.first_name,
             last_name: newUser.last_name,
             email: newUser.email,
@@ -93,7 +93,7 @@ export const login = async(user) => {
 
 export const ForgetPassword = user => {
     return axios
-        .post("https://backend-brown-xi.vercel.app/api/users/reset-password", {
+        .post(API_BASE_URL + "users/reset-password", {
             email: user.email
         })
         .then(response => {
@@ -163,7 +163,7 @@ export const getProfile = async () => {
         // const token_new = localStorage.getItem("usertoken");
         // const decoded = JSON.stringify(token_new); 
     return await axios
-        .get("https://backend-brown-xi.vercel.app/api/users/profile", {
+        .get(API_BASE_URL + "users/profile", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
@@ -172,7 +172,7 @@ export const getProfile = async () => {
 
 export const updatePassword = async (payload) => {
     return await axios
-        .post("https://backend-brown-xi.vercel.app/api/users/resetpassword", payload, {
+        .post(API_BASE_URL + "users/resetpassword", payload, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
@@ -211,7 +211,7 @@ export const deleteSharedProfile = async (profileId) => {
 
 export const SaveSharedProfile = async (payload) => {
     return await axios
-        .post("https://backend-brown-xi.vercel.app/api/saved-profiles/save-profile", payload, {
+        .post(API_BASE_URL + "saved-profiles/save-profile", payload, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
@@ -220,7 +220,7 @@ export const SaveSharedProfile = async (payload) => {
 
 export const MySharedProfile = async () => {
     return await axios.get(
-        "https://backend-brown-xi.vercel.app/api/saved-profiles/saved-profiles",
+        API_BASE_URL + "saved-profiles/saved-profiles",
         {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`,
@@ -232,7 +232,7 @@ export const MySharedProfile = async () => {
 
 export const getPlatforms = async () => {
     return await axios
-        .get("https://backend-brown-xi.vercel.app/api/social-media-platforms/platforms", {
+        .get(API_BASE_URL + "social-media-platforms/platforms", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
@@ -240,7 +240,7 @@ export const getPlatforms = async () => {
 }
 export const getSavedProfile = async () => {
     return await axios
-        .get("https://backend-brown-xi.vercel.app/api/saved-profiles/saved-profiles", {
+        .get(API_BASE_URL + "saved-profiles/saved-profiles", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
@@ -271,7 +271,7 @@ export const updateProfile = async (payload) => {
 
 export const updateProfileImage = async (payload) => {
     return await axios
-        .put("https://backend-brown-xi.vercel.app/api/users/update-image", payload, {
+        .put(API_BASE_URL + "users/update-image", payload, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
