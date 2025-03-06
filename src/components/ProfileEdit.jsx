@@ -71,7 +71,7 @@ const ProfileEdit = ({ data, cover }) => {
             console.log("Received API Data:", data);
     
             const formattedSocialLinks = data.social_links?.reduce((acc, item) => {
-                acc[item?.social_media_platforms?.social_name] = item.social_link || "";
+                acc[item?.social_platform?.social_name] = item.social_link || "";
                 return acc;
             }, {}) || {};
     
@@ -115,7 +115,7 @@ const ProfileEdit = ({ data, cover }) => {
                 // Format social links into an object using the correct platform key
                 const formattedSocialLinks = profileData.social_links?.reduce((acc, item) => {
                     if (item.platform) {  // Changed from social_platform to platform
-                        acc[item.platform.social_name] = item.social_link || "";
+                        acc[item.social_media_platforms.social_name] = item.social_link || "";
                     }
                     return acc;
                 }, {}) || {};
