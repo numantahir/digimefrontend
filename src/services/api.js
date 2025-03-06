@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "https://digime.novatore-solutions.com/api/";
+// const API_BASE_URL = process.env.REACT_APP_API_URL || "https://digime.novatore-solutions.com/api/";
+const API_BASE_URL = process.env.REACT_APP_API_URL || "https://backend-brown-xi.vercel.app/api/";
 
 const axiosInstance = axios.create({
     baseURL: API_BASE_URL,
@@ -21,7 +22,7 @@ export const logout = () => {
 
 export const register = newUser => {
     return axios
-        .post("https://digime.novatore-solutions.com/api/users/register", {
+        .post("https://backend-brown-xi.vercel.app/api/users/register", {
             first_name: newUser.first_name,
             last_name: newUser.last_name,
             email: newUser.email,
@@ -38,17 +39,17 @@ export const login = async(user) => {
         password: user.password
     })
     .then((response) => {
-        console.log("Login response data:", response.data);
-        let token = response.data;
+        // console.log("Login response data:", response.data.data.token); 
+        let token = response.data.data.token;
 
         if (!token || typeof token !== 'string') {
             console.error("Received invalid token:", token);
             throw new Error('Invalid token received from server');
         }
 
-        // localStorage.setItem("usertoken", token); // Store as plain string
+        localStorage.setItem("usertoken", JSON.stringify(response.data.data.token));
 
-        console.log("Token stored:", token);
+        // console.log("Token stored:", token);
 
         return response.data;
     })
@@ -92,7 +93,7 @@ export const login = async(user) => {
 
 export const ForgetPassword = user => {
     return axios
-        .post("https://digime.novatore-solutions.com/api/users/reset-password", {
+        .post("https://backend-brown-xi.vercel.app/api/users/reset-password", {
             email: user.email
         })
         .then(response => {
@@ -122,44 +123,56 @@ axiosInstance.interceptors.request.use((config) => {
     return Promise.reject(error);
 });
 
+// export const getProfile = async () => {
+//     try {
+//         // alert('GetProfileSection');
+//         // const token = localStorage.getItem("usertoken");
+//         console.log("Secret Key:", process.env.SECRET_KEY);
+//         const token_new = localStorage.getItem("usertoken");
+// const decoded = JSON.parse(atob(token_new.split('.')[1])); 
+// console.log("Decoded Token:", decoded);
+// console.log("Token Expiry:", new Date(decoded.exp * 1000).toUTCString());
+
+//         let token = localStorage.getItem("usertoken")?.trim();
+//         console.log('Token ...> ',token);
+//         try {
+//             // token = JSON.parse(token); // Convert back to object if necessary
+//         } catch (e) {
+//             console.warn("Token is already a string.");
+//         }
+//         if (!token) {
+//             throw new Error("No auth token found");
+//         }
+
+//         const response = await axios.get(`${API_BASE_URL}users/profile`, {
+//             headers: {
+//                 Authorization: `Bearer ${token}`
+//             }
+//         });
+//         return response.data;
+//     } catch (error) {
+//         console.error("Profile fetch error:", error);
+//         if (error.response?.status === 401) {
+//             logout();
+//         }
+//         throw error;
+//     }
+// };
+
 export const getProfile = async () => {
-    try {
-        // const token = localStorage.getItem("usertoken");
-        console.log("Secret Key:", process.env.SECRET_KEY);
-        const token_new = localStorage.getItem("usertoken");
-const decoded = JSON.parse(atob(token_new.split('.')[1])); 
-console.log("Decoded Token:", decoded);
-console.log("Token Expiry:", new Date(decoded.exp * 1000).toUTCString());
-
-        let token = localStorage.getItem("usertoken")?.trim();
-        console.log('Token ...> ',token);
-        try {
-            // token = JSON.parse(token); // Convert back to object if necessary
-        } catch (e) {
-            console.warn("Token is already a string.");
-        }
-        if (!token) {
-            throw new Error("No auth token found");
-        }
-
-        const response = await axios.get(`${API_BASE_URL}users/profile`, {
+        // const token_new = localStorage.getItem("usertoken");
+        // const decoded = JSON.stringify(token_new); 
+    return await axios
+        .get("https://backend-brown-xi.vercel.app/api/users/profile", {
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
-        });
-        return response.data;
-    } catch (error) {
-        console.error("Profile fetch error:", error);
-        if (error.response?.status === 401) {
-            logout();
-        }
-        throw error;
-    }
-};
+        })
+}
 
 export const updatePassword = async (payload) => {
     return await axios
-        .post("https://digime.novatore-solutions.com/api/users/resetpassword", payload, {
+        .post("https://backend-brown-xi.vercel.app/api/users/resetpassword", payload, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
@@ -167,7 +180,7 @@ export const updatePassword = async (payload) => {
 }
 
 export const sharedProfile = async (username) => {
-    return await axios.get(`https://digime.novatore-solutions.com/api/users/share-profile`, {
+    return await axios.get(`https://backend-brown-xi.vercel.app/api/users/share-profile`, {
         params: { url: username }
     });
 };
@@ -180,7 +193,7 @@ export const deleteSharedProfile = async (profileId) => {
         if (!token) throw new Error("No auth token found");
 
         const response = await axios.delete(
-            `https://digime.novatore-solutions.com/api/saved-profiles/delete-profile/${profileId}`,
+            `https://backend-brown-xi.vercel.app/api/saved-profiles/delete-profile/${profileId}`,
             {
                 headers: {
                      Authorization: `Bearer ${localStorage.getItem("usertoken")}`
@@ -198,7 +211,7 @@ export const deleteSharedProfile = async (profileId) => {
 
 export const SaveSharedProfile = async (payload) => {
     return await axios
-        .post("https://digime.novatore-solutions.com/api/saved-profiles/save-profile", payload, {
+        .post("https://backend-brown-xi.vercel.app/api/saved-profiles/save-profile", payload, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
@@ -207,7 +220,7 @@ export const SaveSharedProfile = async (payload) => {
 
 export const MySharedProfile = async () => {
     return await axios.get(
-        "https://digime.novatore-solutions.com/api/saved-profiles/saved-profiles",
+        "https://backend-brown-xi.vercel.app/api/saved-profiles/saved-profiles",
         {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`,
@@ -219,7 +232,7 @@ export const MySharedProfile = async () => {
 
 export const getPlatforms = async () => {
     return await axios
-        .get("https://digime.novatore-solutions.com/api/social-media-platforms/platforms", {
+        .get("https://backend-brown-xi.vercel.app/api/social-media-platforms/platforms", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
@@ -227,7 +240,7 @@ export const getPlatforms = async () => {
 }
 export const getSavedProfile = async () => {
     return await axios
-        .get("https://digime.novatore-solutions.com/api/saved-profiles/saved-profiles", {
+        .get("https://backend-brown-xi.vercel.app/api/saved-profiles/saved-profiles", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }
@@ -258,7 +271,7 @@ export const updateProfile = async (payload) => {
 
 export const updateProfileImage = async (payload) => {
     return await axios
-        .put("https://digime.novatore-solutions.com/api/users/update-image", payload, {
+        .put("https://backend-brown-xi.vercel.app/api/users/update-image", payload, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("usertoken")}`
             }

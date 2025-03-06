@@ -16,7 +16,7 @@ const EditProfile = () => {
         //alert(' > ' + response.data.cover_image);
         // alert(JSON.stringify(response.data));
         if (response.data) {
-            setData(response.data);
+            setData(response.data.data);
         }
         
     }

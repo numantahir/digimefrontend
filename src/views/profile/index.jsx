@@ -13,7 +13,7 @@ const Profile = () => {
     const fetchProfile = async () => {
         const response = await getProfile();
         if (response.data) {
-            setData(response.data);
+            setData(response.data.data);
         }
     }
     
